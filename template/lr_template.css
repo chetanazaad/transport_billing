@@ -1,0 +1,151 @@
+@page {
+  size: A4;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.page-border {
+  position: absolute;
+  top: 5mm;
+  left: 5mm;
+  right: 5mm;
+  bottom: 5mm;
+  border: 1px solid black;
+}
+
+.header {
+  position: absolute;
+  top: 8mm;
+  left: 8mm;
+  right: 8mm;
+  height: 30mm;
+  display: flex;
+}
+
+.logo {
+  width: 25mm;
+  height: 25mm;
+}
+
+.company {
+  flex: 1;
+  text-align: center;
+}
+
+.company h1 {
+  font-size: 16pt;
+  margin: 0;
+}
+
+.right-info {
+  width: 60mm;
+  font-size: 9pt;
+  text-align: right;
+}
+
+.top-row {
+  position: absolute;
+  top: 40mm;
+  left: 8mm;
+  right: 8mm;
+  height: 12mm;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10pt;
+}
+
+.party {
+  position: absolute;
+  top: 55mm;
+  left: 8mm;
+  right: 8mm;
+  height: 25mm;
+  font-size: 10pt;
+}
+
+.party p {
+  margin: 2mm 0;
+}
+
+.goods {
+  position: absolute;
+  top: 85mm;
+  left: 8mm;
+  right: 8mm;
+  height: 100mm;
+  border: 1px solid black;
+}
+
+.goods-left {
+  position: absolute;
+  left: 0;
+  width: 25mm;
+  border-right: 1px solid black;
+}
+
+.goods-center {
+  position: absolute;
+  left: 25mm;
+  right: 60mm;
+}
+
+.goods-right {
+  position: absolute;
+  width: 60mm;
+  right: 0;
+  border-left: 1px solid black;
+}
+
+.tax {
+  position: absolute;
+  right: 8mm;
+  bottom: 70mm;
+  width: 60mm;
+  border: 1px solid black;
+  font-size: 10pt;
+}
+
+.bank {
+  position: absolute;
+  bottom: 40mm;
+  left: 8mm;
+  font-size: 10pt;
+}
+
+.signature {
+  position: absolute;
+  bottom: 25mm;
+  right: 15mm;
+  width: 40mm;
+}
+
+.red-note {
+  position: absolute;
+  bottom: 20mm;
+  right: 2mm;
+  transform: rotate(-90deg);
+  transform-origin: right bottom;
+  font-size: 9pt;
+  color: red;
+  font-weight: bold;
+}
+
+.copy-label {
+  position: absolute;
+  bottom: 90mm;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  font-size: 12pt;
+}

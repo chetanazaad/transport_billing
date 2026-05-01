@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VAARAHI ROAD LINE'S — LR Bill Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', Arial, sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; }
+
+    /* ========== NAVBAR ========== */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 40px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-link {
+      color: #64748b;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+    .nav-link:hover, .nav-link.active { color: #2563eb; }
+    .btn-login {
+      background: transparent;
+      border: 1px solid #2563eb;
+      color: #2563eb;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-login:hover { background: #2563eb; color: #fff; }
+
+    /* ========== BRAND HEADER ========== */
+    .brand-header {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%);
+      padding: 40px 0;
+      text-align: center;
+    }
+    .brand-header .brand-logo {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #1d4ed8, #2563eb, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    .brand-header .brand-sub { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #475569; }
+
+    /* ========== MAIN CONTAINER ========== */
+    .main { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px 20px; }
+    .page-section { display: none; }
+    .page-section.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ========== FORM CARD ========== */
+    .form-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 36px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+    .section { margin-bottom: 28px; }
+    .section-title { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #2563eb; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(37,99,235,0.15); }
+    .row { display: grid; gap: 14px; }
+    .row-2 { grid-template-columns: 1fr 1fr; }
+    .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .row + .row { margin-top: 14px; }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.span-full { grid-column: 1 / -1; }
+    label { font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 5px; letter-spacing: 0.5px; }
+    input { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #0f172a; width: 100%; transition: 0.2s; }
+    input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    select { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #0f172a; width: 100%; transition: 0.2s; }
+    select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    .divider { height: 1px; background: #e2e8f0; margin: 24px 0; }
+    .btn-generate { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; font-size: 15px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #2563eb, #3b82f6); border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; margin-top: 8px; }
+    .btn-generate:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(37,99,235,0.3); }
+
+    /* ========== HISTORY TABLE ========== */
+    .history-card { background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; }
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 16px; border-bottom: 1px solid #e2e8f0; }
+    td { padding: 16px; font-size: 13px; color: #1e293b; border-bottom: 1px solid #f1f5f9; }
+    tr:hover td { background: #f8fafc; }
+    .btn-download { color: #2563eb; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .btn-download:hover { text-decoration: underline; }
+
+    /* ========== LOGIN MODAL ========== */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .login-card { background: #ffffff; width: 100%; max-width: 380px; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+    .login-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; text-align: center; color: #0f172a; }
+
+    .status { text-align: center; margin-top: 14px; font-size: 13px; color: #64748b; min-height: 22px; }
+    .status.success { color: #16a34a; }
+    .status.error { color: #dc2626; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #2563eb; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-copy {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .btn-copy:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    .btn-copy.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .btn-reset {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+    }
+
+    .actions-container {
+      margin-top: 30px;
+      padding: 24px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .copy-buttons-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .copy-buttons-row .btn-generate {
+      flex: 2.5;
+      margin: 0;
+      height: 48px;
+    }
+
+    .copy-buttons-row .btn-copy {
+      flex: 1;
+      height: 48px;
+      font-size: 11px;
+      padding: 0 5px;
+    }
+
+    .bottom-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar">
+    <div class="nav-links">
+      <a class="nav-link active" onclick="showPage('new-bill')">New Bill</a>
+      <a class="nav-link" id="nav-history" onclick="checkAuthAndShowHistory()">History</a>
+    </div>
+    <div id="auth-status">
+      <button class="btn-login" onclick="openLogin()">Login</button>
+    </div>
+  </nav>
+
+  <header class="brand-header">
+    <div class="brand-logo">VAARAHI ROAD LINE'S</div>
+    <div class="brand-sub">National Permit &amp; Five State Lorry Suppliers</div>
+  </header>
+
+  <main class="main">
+    
+    <!-- ========== NEW BILL SECTION ========== -->
+    <section id="new-bill" class="page-section active">
+      <div class="form-card">
+        <form id="lr-form" onsubmit="return false;">
+          <!-- Buttons moved to bottom -->
+          <div class="section">
+            <div class="section-title">📋 LR &amp; Route Details</div>
+            <div class="row row-4">
+              <div class="form-group">
+                <label>LR No</label>
+                <input id="lr_no" name="lr_no" placeholder="Prefix-Num" required readonly />
+              </div>
+              <div class="form-group">
+                <label>From</label>
+                <input id="from" name="from" placeholder="Origin" required />
+              </div>
+              <div class="form-group">
+                <label>To</label>
+                <input id="to" name="to" placeholder="Destination" required />
+              </div>
+              <div class="form-group">
+                <label>Date</label>
+                <input id="date" name="date" type="date" required />
+              </div>
+            </div>
+            <div class="row row-2" style="margin-top:14px;">
+              <div class="form-group">
+                <label>Truck No</label>
+                <input id="truck" name="truck" placeholder="e.g. AP16TW6809" required />
+              </div>
+              <div class="form-group">
+                <label>Delivery At</label>
+                <input id="delivery_at" name="delivery_at" placeholder="Delivery location" />
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">👤 Party Details</div>
+            <div class="row row-2">
+              <div class="form-group">
+                <label>Consignor</label>
+                <input id="consignor" name="consignor" placeholder="Sender" required />
+              </div>
+              <div class="form-group">
+                <label>Consignee</label>
+                <input id="consignee" name="consignee" placeholder="Receiver" required />
+              </div>
+            </div>
+            <div class="row row-2" style="margin-top:14px;">
+              <div class="form-group">
+                <label>Consignor GSTIN</label>
+                <input id="consignor_gstin" name="consignor_gstin" placeholder="15-digit GSTIN" />
+              </div>
+              <div class="form-group">
+                <label>Consignee GSTIN</label>
+                <input id="consignee_gstin" name="consignee_gstin" placeholder="15-digit GSTIN" />
+              </div>
+            </div>
+            <div class="row row-1" style="margin-top:14px;">
+              <div class="form-group span-full">
+                <label>Name &amp; Address</label>
+                <input id="name_address" name="name_address" placeholder="Full name and address" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">📦 Goods & Tax Details</div>
+            <div class="row row-4">
+              <div class="form-group">
+                <label>Description</label>
+                <input id="description" name="description" placeholder="Goods description" />
+              </div>
+              <div class="form-group">
+                <label>No. of Packs</label>
+                <input id="no_of_packs" name="no_of_packs" placeholder="e.g. 100" />
+              </div>
+              <div class="form-group">
+                <label>Nett Weight</label>
+                <input id="nett_weight" name="nett_weight" placeholder="e.g. 3500 Kgs" />
+              </div>
+              <div class="form-group">
+                <label>Value (Rs.)</label>
+                <input id="value" name="value" placeholder="Goods Value" />
+              </div>
+            </div>
+
+            <div class="row row-4" style="margin-top:14px;">
+              <div class="form-group">
+                <label>Lot No</label>
+                <input id="lot_no" name="lot_no" placeholder="Lot Number" />
+              </div>
+              <div class="form-group">
+                <label>Invoice No</label>
+                <input id="invoice_no" name="invoice_no" placeholder="Invoice Num" />
+              </div>
+              <div class="form-group">
+                <label>Way Bill No</label>
+                <input id="way_bill_no" name="way_bill_no" placeholder="E-Way Bill" />
+              </div>
+              <div class="form-group">
+                <label>Insur. Policy No</label>
+                <input id="insurance_policy_no" name="insurance_policy_no" placeholder="Policy No" />
+              </div>
+            </div>
+
+            <div class="row row-3" style="margin-top:14px;">
+              <div class="form-group">
+                <label>P.R. Nos</label>
+                <input id="pr_nos" name="pr_nos" placeholder="PR Numbers" />
+              </div>
+              <div class="form-group">
+                <label>P.M. No</label>
+                <input id="pm_no" name="pm_no" placeholder="PM Number" />
+              </div>
+              <div class="form-group">
+                <label>AMC No</label>
+                <input id="amc_no" name="amc_no" placeholder="AMC Number" />
+              </div>
+            </div>
+            
+            <div class="row row-4" style="margin-top:20px;">
+              <div class="form-group">
+                <label>Freight Amount (Rs.)</label>
+                <input id="freight_amt" name="freight_amt" type="number" placeholder="Taxable Amt" oninput="calculateTotal()" />
+              </div>
+              <div class="form-group">
+                <label>GST %</label>
+                <input id="gst_pct" name="gst_pct" type="number" value="5" oninput="calculateTotal()" />
+              </div>
+              <div class="form-group">
+                <label>GST Type</label>
+                <select id="gst_type" name="gst_type" onchange="calculateTotal()">
+                  <option value="intra">CGST + SGST</option>
+                  <option value="inter">IGST</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Advance (Rs.)</label>
+                <input id="advance" name="advance" type="number" value="0" oninput="calculateTotal()" />
+              </div>
+            </div>
+
+            <div class="row row-2" style="margin-top:14px; background: rgba(37, 99, 235, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(37, 99, 235, 0.3);">
+              <div class="form-group">
+                <label>Calculated Taxes</label>
+                <div style="display:flex; gap:10px;">
+                  <input id="cgst" name="cgst" readonly placeholder="CGST" style="background:#f8fafc;" />
+                  <input id="sgst" name="sgst" readonly placeholder="SGST" style="background:#f8fafc;" />
+                  <input id="igst" name="igst" readonly placeholder="IGST" style="background:#f8fafc;" />
+                </div>
+                <input type="hidden" id="gst_pct_split" name="gst_pct_split" />
+                <input type="hidden" id="gst_pct_full" name="gst_pct_full" />
+              </div>
+              <div class="form-group">
+                <label>Grand Total</label>
+                <input id="grand_total" name="grand_total" placeholder="Total amount" style="font-weight:700; color:#2563eb; font-size:18px;" readonly />
+              </div>
+            </div>
+
+            <div class="row row-1" style="margin-top:14px;">
+              <div class="form-group">
+                <label>To Pay Rupees (Words)</label>
+                <input id="to_pay_rupees" name="to_pay_rupees" placeholder="Amount in words" />
+              </div>
+            </div>
+          </div>
+
+          <div class="actions-container">
+            <div class="copy-buttons-row">
+              <button type="button" class="btn-generate" id="submit-btn" onclick="generateSpecificBill('')" style="flex: 2.5; margin: 0;">⚡ Generate Main LR PDF</button>
+              <button type="button" class="btn-copy" onclick="generateSpecificBill('CONSIGNEE COPY')">🖨️ Consignee</button>
+              <button type="button" class="btn-copy" onclick="generateSpecificBill('CONSIGNOR COPY')">🖨️ Consignor</button>
+              <button type="button" class="btn-copy" onclick="generateSpecificBill('TRUCK COPY')">🖨️ Truck</button>
+              <button type="button" class="btn-copy" onclick="generateSpecificBill('OFFICE COPY')">🖨️ Office</button>
+            </div>
+
+            <div class="bottom-meta">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span id="lock-status" style="font-size:12px; color:#64748b; font-weight:600;">🔓 ACTIVE ENTRY</span>
+              </div>
+              <button type="button" class="btn-reset" id="reset-btn" onclick="resetForm()">🔄 RESET PORTAL</button>
+            </div>
+          </div>
+          <div class="status" id="status"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========== HISTORY SECTION ========== -->
+    <section id="history" class="page-section">
+      <div class="history-card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>LR No</th>
+                <th>Consignor</th>
+                <th>Consignee</th>
+                <th>Amount</th>
+                <th>Date Generated</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+              <!-- Bills will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== LOGIN MODAL ========== -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="login-card">
+      <h2>Staff Login</h2>
+      <form id="login-form">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label>Username</label>
+          <input type="text" id="username" value="admin" required />
+        </div>
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label>Password</label>
+          <input type="password" id="password" value="admin123" required />
+        </div>
+        <button type="submit" class="btn-generate">Login Now</button>
+        <button type="button" class="btn-login" style="width:100%; margin-top:8px; border:none; color:#64748b;" onclick="closeLogin()">Cancel</button>
+        <div id="login-error" class="status error"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let isLoggedIn = false;
+
+    function calculateTotal() {
+      const freight = parseFloat(document.getElementById('freight_amt').value) || 0;
+      const gstPct = parseFloat(document.getElementById('gst_pct').value) || 0;
+      const advance = parseFloat(document.getElementById('advance').value) || 0;
+      const type = document.getElementById('gst_type').value;
+
+      const totalGst = (freight * gstPct) / 100;
+      let cgst = 0, sgst = 0, igst = 0;
+
+      if (type === 'intra') {
+        cgst = totalGst / 2;
+        sgst = totalGst / 2;
+        document.getElementById('igst').value = '';
+        document.getElementById('cgst').value = cgst.toFixed(2);
+        document.getElementById('sgst').value = sgst.toFixed(2);
+        document.getElementById('gst_pct_split').value = (gstPct / 2).toString();
+        document.getElementById('gst_pct_full').value = '';
+      } else {
+        igst = totalGst;
+        document.getElementById('cgst').value = '';
+        document.getElementById('sgst').value = '';
+        document.getElementById('igst').value = igst.toFixed(2);
+        document.getElementById('gst_pct_split').value = '';
+        document.getElementById('gst_pct_full').value = gstPct.toString();
+      }
+
+      const grandTotal = freight + totalGst - advance;
+      document.getElementById('grand_total').value = Math.round(grandTotal);
+      document.getElementById('to_pay_rupees').value = numberToWords(Math.round(grandTotal)) + " Only";
+    }
+
+    function numberToWords(num) {
+      const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+      const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      if ((num = num.toString()).length > 9) return 'overflow';
+      let n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+      if (!n) return '';
+      let str = '';
+      str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+      str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+      str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+      str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+      str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+      return str.trim();
+    }
+
+    // Load initial data
+    window.onload = () => {
+      document.getElementById('date').valueAsDate = new Date();
+      fetchNextLR();
+    };
+
+    async function fetchNextLR() {
+      const res = await fetch('/api/next-lr');
+      const data = await res.json();
+      document.getElementById('lr_no').value = data.lr_no;
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      if (event && event.target) event.target.classList.add('active');
+      if (pageId === 'history') loadHistory();
+    }
+
+    function checkAuthAndShowHistory() {
+      if (!isLoggedIn) {
+        openLogin();
+        return;
+      }
+      showPage('history');
+    }
+
+    function openLogin() { document.getElementById('login-modal').classList.add('active'); }
+    function closeLogin() { document.getElementById('login-modal').classList.remove('active'); }
+
+    document.getElementById('login-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin', password: 'admin123' })
+      });
+      if (res.ok) {
+        isLoggedIn = true;
+        closeLogin();
+        document.getElementById('auth-status').innerHTML = '<span style="color:#16a34a; font-size:12px; font-weight:600;">✓ ADMIN LOGGED IN</span>';
+        showPage('history');
+      } else {
+        document.getElementById('login-error').textContent = 'Invalid credentials';
+      }
+    };
+
+    async function loadHistory() {
+      const res = await fetch('/api/bills');
+      const bills = await res.json();
+      const body = document.getElementById('history-body');
+      body.innerHTML = bills.map(b => `
+        <tr>
+          <td style="font-weight:700; color:#2563eb;">${b.lr_no}</td>
+          <td>${b.consignor}</td>
+          <td>${b.consignee}</td>
+          <td>₹${b.total_amount}</td>
+          <td style="color:#64748b;">${new Date(b.created_at).toLocaleDateString()}</td>
+          <td><a href="/output/${b.file_path.split(/[\\/]/).pop()}" class="btn-download" target="_blank">Download</a></td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('lr-form').onsubmit = (e) => e.preventDefault();
+
+    async function generateSpecificBill(copyLabel) {
+      const form = document.getElementById('lr-form');
+      const status = document.getElementById('status');
+      const buttons = document.querySelectorAll('.btn-copy, .btn-generate');
+      
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      buttons.forEach(b => b.classList.add('loading'));
+      status.className = 'status';
+      const displayLabel = copyLabel || 'Main Copy';
+      status.textContent = 'Generating ' + displayLabel + '...';
+
+      try {
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        // ONLY generate the single specific copy requested
+        data.requestedCopies = [copyLabel];
+
+        const res = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) throw new Error('Generation failed');
+        
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const filenameLabel = copyLabel ? copyLabel.replace(' ','_') : 'Main';
+        a.download = `LR_${data.lr_no}_${filenameLabel}.pdf`;
+        a.click();
+        
+        status.className = 'status success';
+        status.textContent = '✓ ' + displayLabel + ' generated successfully!';
+        
+        // Lock the status to show that we are in the middle of a multi-copy session
+        const lockStatus = document.getElementById('lock-status');
+        if (lockStatus) {
+            lockStatus.textContent = '🔒 SESSION LOCKED (LR: ' + data.lr_no + ')';
+            lockStatus.style.color = '#dc2626';
+        }
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = 'Error: ' + err.message;
+      } finally {
+        buttons.forEach(b => b.classList.remove('loading'));
+      }
+    }
+
+    function resetForm() {
+      console.log('RESET INITIATED');
+      
+      const form = document.getElementById('lr-form');
+      if (!form) return;
+
+      // Clear all inputs manually
+      const allInputs = form.querySelectorAll('input');
+      allInputs.forEach(input => {
+        if (input.type !== 'hidden') {
+          input.value = '';
+        }
+      });
+
+      // Reset selects
+      const allSelects = form.querySelectorAll('select');
+      allSelects.forEach(sel => sel.selectedIndex = 0);
+
+      // Re-initialize date
+      document.getElementById('date').valueAsDate = new Date();
+
+      // Reset lock status
+      const lockStatus = document.getElementById('lock-status');
+      if (lockStatus) {
+        lockStatus.textContent = '🔓 ACTIVE ENTRY';
+        lockStatus.style.color = '#64748b';
+      }
+
+      // Fetch next LR number
+      fetchNextLR();
+
+      // Show status
+      const status = document.getElementById('status');
+      if (status) {
+        status.textContent = '✓ Portal Reset Successfully';
+        status.className = 'status success';
+        setTimeout(() => { status.textContent = ''; }, 3000);
+      }
+      
+      console.log('RESET COMPLETE');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LR Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input { padding: 5px; width: 250px; }
+    button { margin-top: 15px; padding: 10px 20px; }
+  </style>
+</head>
+<body>
+
+  <h2>LR Bill Form</h2>
+
+  <label>LR No:</label>
+  <input id="lr_no" />
+
+  <label>Date:</label>
+  <input id="date" />
+
+  <label>From:</label>
+  <input id="from" />
+
+  <label>To:</label>
+  <input id="to" />
+
+  <label>Truck:</label>
+  <input id="truck" />
+
+  <label>Consignor:</label>
+  <input id="consignor" />
+
+  <label>Consignee:</label>
+  <input id="consignee" />
+
+  <label>Address:</label>
+  <input id="address" />
+
+  <label>No of Packs:</label>
+  <input id="no_of_packs" />
+
+  <label>LOT No:</label>
+  <input id="lot_no" />
+
+  <label>Invoice:</label>
+  <input id="invoice" />
+
+  <label>PR No:</label>
+  <input id="pr_no" />
+
+  <label>PM No:</label>
+  <input id="pm_no" />
+
+  <label>Weight:</label>
+  <input id="weight" />
+
+  <label>SGST:</label>
+  <input id="sgst" />
+
+  <label>CGST:</label>
+  <input id="cgst" />
+
+  <label>IGST:</label>
+  <input id="igst" />
+
+  <label>Advance:</label>
+  <input id="advance" />
+
+  <label>Total:</label>
+  <input id="total" />
+
+  <br/>
+  <button onclick="submitForm()">Generate PDF</button>
+
+  <script>
+    function getFormData() {
+      return {
+        lr_no: document.getElementById('lr_no').value,
+        date: document.getElementById('date').value,
+        from: document.getElementById('from').value,
+        to: document.getElementById('to').value,
+        truck: document.getElementById('truck').value,
+        consignor: document.getElementById('consignor').value,
+        consignee: document.getElementById('consignee').value,
+        address: document.getElementById('address').value,
+        no_of_packs: document.getElementById('no_of_packs').value,
+        lot_no: document.getElementById('lot_no').value,
+        invoice: document.getElementById('invoice').value,
+        pr_no: document.getElementById('pr_no').value,
+        pm_no: document.getElementById('pm_no').value,
+        weight: document.getElementById('weight').value,
+        sgst: document.getElementById('sgst').value,
+        cgst: document.getElementById('cgst').value,
+        igst: document.getElementById('igst').value,
+        advance: document.getElementById('advance').value,
+        total: document.getElementById('total').value
+      };
+    }
+
+    function submitForm() {
+      const data = getFormData();
+      fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(res => res.json())
+        .then(res => alert(res.message));
+    }
+  </script>
+
+</body>
+</html>

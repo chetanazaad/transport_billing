@@ -1,0 +1,6 @@
+node_modules/
+output/
+*.pdf
+*.db
+temp_*.html
+output_*.pdf

@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* ============================================================
+       PRINT / PAGE SETUP
+       ============================================================ */
+    @page {
+      size: A4 landscape;
+      margin: 0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      font-size: 9pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color: #000; /* Default color for values */
+    }
+
+    /* ============================================================
+       PAGE — A4 Landscape (297mm × 210mm)
+       ============================================================ */
+    .page {
+      width: 297mm;
+      height: 210mm;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    /* Page border */
+    .page-border {
+      position: absolute;
+      top: 3mm;
+      left: 3mm;
+      right: 3mm;
+      bottom: 3mm;
+      border: 2px solid #000;
+    }
+
+    /* ============================================================
+       HEADER (top 30mm of page-border)
+       ============================================================ */
+    .logo {
+      position: absolute;
+      top: 2mm;
+      left: 3mm;
+      width: 18mm;
+      height: 22mm;
+      object-fit: contain;
+    }
+
+    .header-center {
+      position: absolute;
+      top: 1mm;
+      left: 24mm;
+      right: 62mm;
+      text-align: center;
+    }
+
+    .header-center .gstin {
+      font-size: 8pt;
+      font-weight: bold;
+      margin-bottom: 0.5mm;
+      color: #000080;
+    }
+
+    .header-center .company-name {
+      font-size: 18pt;
+      font-weight: bold;
+      letter-spacing: 1pt;
+      margin-bottom: 0.5mm;
+    }
+
+    .header-center .company-subtitle {
+      font-size: 8pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 1mm;
+      color: #000080;
+    }
+
+    .header-center .company-address {
+      font-size: 7.5pt;
+      font-weight: bold;
+      color: #000080;
+    }
+
+    .header-right {
+      position: absolute;
+      top: 1mm;
+      right: 3mm;
+      width: 56mm;
+      text-align: right;
+      font-size: 8.5pt;
+      line-height: 1.7;
+      color: #000080;
+    }
+
+    .header-right .prop {
+      font-weight: bold;
+    }
+
+    .header-right .lr-box {
+      font-weight: bold;
+      font-size: 11pt;
+      margin-top: 2mm;
+      color: #000; /* LR No value should be black */
+    }
+
+    .header-right .lr-box span.lbl {
+      color: #000080;
+    }
+
+    .header-line {
+      position: absolute;
+      top: 30mm;
+      left: 0;
+      right: 0;
+      border-top: 2px solid #000;
+    }
+
+    /* ============================================================
+       DECLARATION SIDEBAR (left 22mm, below header)
+       ============================================================ */
+    .declaration {
+      position: absolute;
+      top: 30mm;
+      left: 0;
+      width: 22mm;
+      bottom: 0;
+      border-right: 1.5px solid #000;
+      font-size: 8pt;
+      text-align: center;
+      padding: 3mm 1.5mm;
+      line-height: 1.6;
+      color: #000080;
+    }
+
+    .declaration .decl-title {
+      font-weight: bold;
+      font-size: 7.5pt;
+      margin-bottom: 2mm;
+      text-decoration: underline;
+      white-space: nowrap;
+    }
+
+    /* ============================================================
+       CONTENT ROWS (right of declaration sidebar)
+       ============================================================ */
+
+    /* --- From / To / Truck / Date --- */
+    .row-top {
+      position: absolute;
+      top: 30mm;
+      left: 22mm;
+      right: 0;
+      height: 8mm;
+      border-bottom: 1.5px solid #000;
+    }
+
+    .row-top table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+    }
+
+    .row-top td {
+      border-right: 1px solid #000;
+      padding: 0 2mm;
+      font-size: 9pt;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .row-top td:last-child {
+      border-right: none;
+    }
+
+    .row-top .lbl {
+      font-weight: bold;
+      padding-right: 2mm;
+      color: #000080;
+    }
+
+    .row-top .val {
+      font-weight: bold;
+      font-size: 11pt;
+      color: #000;
+    }
+
+    /* --- Consignor --- */
+    .row-consignor {
+      position: absolute;
+      top: 38mm;
+      left: 22mm;
+      right: 0;
+      height: 6mm;
+      border-bottom: 1px solid #000;
+      padding: 0 3mm;
+      font-size: 9pt;
+      line-height: 6mm;
+    }
+
+    .row-consignor .lbl {
+      font-weight: bold;
+      display: inline-block;
+      width: 24mm;
+      color: #000080;
+    }
+
+    .row-consignor .val {
+      font-weight: bold;
+      font-size: 11pt;
+    }
+
+    /* --- Consignor GSTIN --- */
+    .row-consignor-gst {
+      position: absolute;
+      top: 44mm;
+      left: 22mm;
+      right: 0;
+      height: 5mm;
+      border-bottom: 1px solid #000;
+      padding: 0 3mm;
+      font-size: 9pt;
+      line-height: 5mm;
+    }
+
+    .row-consignor-gst .lbl {
+      font-weight: bold;
+      display: inline-block;
+      width: 24mm;
+      color: #000080;
+    }
+
+    .row-consignor-gst .val {
+      font-weight: bold;
+      font-size: 11pt;
+    }
+
+    /* --- Consignee --- */
+    .row-consignee {
+      position: absolute;
+      top: 49mm;
+      left: 22mm;
+      right: 0;
+      height: 6mm;
+      border-bottom: 1px solid #000;
+      padding: 0 3mm;
+      font-size: 9pt;
+      line-height: 6mm;
+    }
+
+    .row-consignee .lbl {
+      font-weight: bold;
+      display: inline-block;
+      width: 24mm;
+      color: #000080;
+    }
+
+    .row-consignee .val {
+      font-weight: bold;
+      font-size: 11pt;
+    }
+
+    /* --- Consignee GSTIN --- */
+    .row-consignee-gst {
+      position: absolute;
+      top: 55mm;
+      left: 22mm;
+      right: 0;
+      height: 5mm;
+      border-bottom: 1px solid #000;
+      padding: 0 3mm;
+      font-size: 9pt;
+      line-height: 5mm;
+    }
+
+    .row-consignee-gst .lbl {
+      font-weight: bold;
+      display: inline-block;
+      width: 24mm;
+      color: #000080;
+    }
+
+    .row-consignee-gst .val {
+      font-weight: bold;
+      font-size: 11pt;
+    }
+
+    /* --- Name & Address --- */
+    .row-address {
+      position: absolute;
+      top: 60mm;
+      left: 22mm;
+      right: 0;
+      height: 8mm;
+      border-bottom: 1.5px solid #000;
+      padding: 0 3mm;
+      font-size: 9pt;
+      display: flex;
+      align-items: center;
+    }
+
+    .row-address .lbl {
+      font-weight: bold;
+      width: 24mm;
+      min-width: 24mm;
+      line-height: 1.1;
+      color: #000080;
+    }
+
+    .row-address .val {
+      font-weight: bold;
+      font-size: 10pt;
+    }
+
+    /* ============================================================
+       GOODS TABLE
+       ============================================================ */
+    .goods-area {
+      position: absolute;
+      top: 68mm;
+      left: 22mm;
+      right: 0;
+      bottom: 38mm;
+      border-bottom: 1.5px solid #000;
+    }
+
+    /* Header row */
+    .goods-area .g-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8mm;
+      border-bottom: 1.5px solid #000;
+    }
+
+    .goods-area .g-header table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+    }
+
+    .goods-area .g-header td {
+      text-align: center;
+      font-weight: bold;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      border-right: 1px solid #000;
+      vertical-align: middle;
+      color: #000080;
+    }
+
+    .goods-area .g-header td:last-child {
+      border-right: none;
+    }
+
+    .td-packs {
+      width: 14mm;
+    }
+
+    .td-desc {
+      /* flex */
+    }
+
+    .td-insur {
+      width: 32mm;
+    }
+
+    .td-imp {
+      width: 26mm;
+    }
+
+    .td-freight {
+      width: 30mm;
+    }
+
+    /* Body area */
+    .goods-area .g-body {
+      position: absolute;
+      top: 8mm;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    /* Packs column */
+    .g-col-packs {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 14mm;
+      border-right: 1px solid #000;
+      text-align: center;
+      padding-top: 4mm;
+      font-size: 11pt;
+      font-weight: bold;
+    }
+
+    /* Description column */
+    .g-col-desc {
+      position: absolute;
+      top: 0;
+      left: 14mm;
+      bottom: 0;
+      right: 88mm;
+      border-right: 1px solid #000;
+      padding: 3mm 4mm;
+      font-size: 8.5pt;
+    }
+
+    .g-col-desc .desc-title {
+      font-weight: bold;
+      font-size: 11pt;
+      margin-bottom: 3mm;
+      margin-top: 2mm;
+    }
+
+    /* Description details — two-column table layout for perfect alignment */
+    .desc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+    }
+
+    .desc-table td {
+      padding: 3.5mm 0;
+      vertical-align: top;
+    }
+
+    .desc-table .dlbl {
+      font-weight: bold;
+      white-space: nowrap;
+      width: 24mm;
+      color: #000080;
+    }
+
+    .desc-table .dcol {
+      width: 3mm;
+      font-weight: bold;
+      text-align: center;
+      color: #000080;
+    }
+
+    .desc-table .dval {
+      padding-left: 1mm;
+      font-weight: bold;
+      font-size: 10pt;
+    }
+
+    /* Copy label */
+    .copy-label {
+      position: absolute;
+      bottom: 8mm;
+      left: 14mm;
+      right: 88mm;
+      text-align: center;
+      font-weight: bold;
+      font-size: 11pt;
+      color: #000080;
+    }
+
+    /* Right columns area */
+    .g-col-right {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 88mm;
+    }
+
+    .g-col-insur {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 32mm;
+      border-right: 1px solid #000;
+      padding: 2mm;
+      font-size: 8pt;
+    }
+
+    .g-col-imp {
+      position: absolute;
+      top: 0;
+      left: 32mm;
+      bottom: 0;
+      width: 26mm;
+      border-right: 1px solid #000;
+      padding: 2mm;
+      font-size: 8pt;
+    }
+
+    .g-col-freight {
+      position: absolute;
+      top: 0;
+      left: 58mm;
+      right: 0;
+      bottom: 0;
+      padding: 2mm;
+      font-size: 8pt;
+    }
+
+    /* Tax table (bottom of right columns) */
+    .tax-block {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-top: 1px solid #000;
+    }
+
+    .tax-block table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+    }
+
+    .tax-block td {
+      border-bottom: 1px solid #000;
+      padding: 1mm 2mm;
+      vertical-align: middle;
+    }
+
+    .tax-block tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tax-block .t-lbl {
+      font-weight: bold;
+      width: 32mm;
+      border-right: 1px solid #000;
+      white-space: nowrap;
+      color: #000080;
+    }
+
+    .tax-block .t-pct {
+      width: 26mm;
+      text-align: center;
+      border-right: 1px solid #000;
+      color: #000080;
+    }
+
+    .tax-block .t-val {
+      text-align: left;
+      font-weight: bold;
+      font-size: 11pt;
+    }
+
+    /* ============================================================
+       TO PAY RUPEES
+       ============================================================ */
+    .to-pay {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 38mm;
+      height: 7mm;
+      border-bottom: 1.5px solid #000;
+    }
+
+    .to-pay-decl-space {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 22mm;
+      border-right: 1.5px solid #000;
+    }
+
+    .to-pay-content {
+      position: absolute;
+      /* Position forced in HTML inline style */
+      left: 45mm !important;
+      right: 88mm;
+      top: 0;
+      bottom: 0;
+      font-size: 11pt;
+      font-weight: bold;
+      line-height: 7mm;
+      border-right: 1px solid #000;
+      z-index: 2;
+    }
+
+    .to-pay-content span.lbl {
+      color: #000080;
+    }
+
+    /* ============================================================
+       FOOTER (bottom 38mm)
+       ============================================================ */
+    .footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 38mm;
+    }
+
+    /* Top part: delivery + bank + signature area */
+    .footer-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 26mm;
+    }
+
+    .footer-delivery {
+      position: absolute;
+      top: 2mm;
+      left: 45mm !important;
+      right: 58mm;
+      font-size: 8pt;
+    }
+
+    .footer-delivery .lbl {
+      font-weight: bold;
+      color: #000080;
+    }
+
+    .footer-delivery .val {
+      font-weight: bold;
+      font-size: 10pt;
+    }
+
+    .footer-bank {
+      position: absolute;
+      top: 1mm;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      font-size: 7pt;
+      font-weight: bold;
+      line-height: 1.5;
+      width: max-content;
+      color: #000080;
+    }
+
+    /* Signature + Digital stamp area (right side) */
+    .footer-sign-area {
+      position: absolute;
+      top: 0;
+      right: 3mm;
+      width: 55mm;
+      height: 26mm;
+      text-align: center;
+    }
+
+    .footer-for-company {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 9pt;
+      font-weight: bold;
+      z-index: 2;
+    }
+
+    /* Digital stamp block (inside footer-delivery on the right) */
+    .digital-stamp {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 35mm;
+      border: none;
+      background: transparent;
+      padding: 1.5mm 2mm;
+      font-size: 6pt;
+      line-height: 1.4;
+      color: #000;
+      text-align: center;
+    }
+
+    .digital-stamp .ds-name {
+      font-weight: bold;
+      font-size: 7.5pt;
+      margin-bottom: 0.5mm;
+    }
+
+    /* Wrapper to safely contain the signature */
+    .sign-image-wrapper {
+      position: absolute;
+      top: 4mm;
+      left: 0;
+      right: 0;
+      bottom: 5mm;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Signature image — scaled to fit perfectly */
+    .footer-sign {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }
+
+    /* Line + labels below signature */
+    .footer-sign-line {
+      position: absolute;
+      bottom: 4mm;
+      left: 2mm;
+      right: 2mm;
+      border-top: 1px solid #000;
+      z-index: 2;
+    }
+
+    .footer-auth-label {
+      position: absolute;
+      bottom: 1mm;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 7.5pt;
+      font-weight: bold;
+      z-index: 2;
+      color: #000080;
+    }
+
+    .footer-booking-label {
+      position: absolute;
+      bottom: -1.5mm;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 7.5pt;
+      font-weight: bold;
+    }
+
+    /* Bottom part: jurisdiction + risk + red note */
+    .footer-bottom {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 12mm;
+      border-top: 1px solid #000;
+    }
+
+    .footer-juris {
+      position: absolute;
+      top: 1mm;
+      left: 45mm !important;
+      color: #000080;
+      font-weight: bold;
+    }
+
+    .footer-risk {
+      position: absolute;
+      top: 1mm;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8.5pt;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+      color: #000080;
+    }
+
+    .footer-bo-bottom {
+      position: absolute;
+      top: 1mm;
+      right: 5mm;
+      font-size: 8.5pt;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .footer-red {
+      position: absolute;
+      bottom: 1mm;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 6.5pt;
+      font-weight: bold;
+      color: #cc0000;
+      text-transform: uppercase;
+      letter-spacing: 0.3pt;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ================================================================
+     SINGLE LR PAGE (one copy)
+     ================================================================ -->
+  <div class="page">
+    <div class="page-border">
+
+      <!-- ===== HEADER ===== -->
+      <img src="{{logoPath}}" class="logo" />
+
+      <div class="header-center">
+        <div class="gstin">GSTIN : 37CANPM8452P1ZO</div>
+        <div class="company-name">VAARAHI ROAD LINE'S</div>
+        <div class="company-subtitle">National Permit and Five State Lorry Suppliers</div>
+        <div class="company-address">Flat No. 104, G.V.R. Vista, Syamala Nagar, 8th Line, GUNTUR - 522 006.
+          (A.P.)&nbsp;&nbsp;&nbsp;State Code : 37</div>
+      </div>
+
+      <div class="header-right">
+        <div class="prop">Prop : M. ANIL KUMAR</div>
+        <div>PAN : CANPM8452P</div>
+        <div>Cell : 9390827957</div>
+        <div class="lr-box"><span class="lbl">LR No :</span> {{lr_no}}</div>
+      </div>
+
+      <div class="header-line"></div>
+
+      <!-- ===== DECLARATION SIDEBAR ===== -->
+      <div class="declaration">
+        <div class="decl-title">DECLARATION</div>
+        We have neither taken CENVAT credit of duty on inputs or capital goods or the CENVAT credit of service tax on
+        input services, used for providing such taxable service in relation to goods by road under the provisions of CCR
+        2004 nor the benefits of notification No. 20-06-2003 have been taken by us
+      </div>
+
+      <!-- ===== FROM / TO / TRUCK / DATE ===== -->
+      <div class="row-top">
+        <table>
+          <tr>
+            <td><span class="lbl">From</span> <span class="val">{{from}}</span></td>
+            <td><span class="lbl">To</span> <span class="val">{{to}}</span></td>
+            <td><span class="lbl">Truck</span> <span class="val">{{truck}}</span></td>
+            <td style="border-right:none;"><span class="lbl">Date</span> <span class="val">{{date}}</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- ===== CONSIGNOR ===== -->
+      <div class="row-consignor">
+        <span class="lbl">CONSIGNOR</span><span class="val">{{consignor}}</span>
+      </div>
+
+      <!-- ===== CONSIGNOR GSTIN ===== -->
+      <div class="row-consignor-gst">
+        <span class="lbl">GSTIN</span><span class="val">{{consignor_gstin}}</span>
+      </div>
+
+      <!-- ===== CONSIGNEE ===== -->
+      <div class="row-consignee">
+        <span class="lbl">CONSIGNEE</span><span class="val">{{consignee}}</span>
+      </div>
+
+      <!-- ===== CONSIGNEE GSTIN ===== -->
+      <div class="row-consignee-gst">
+        <span class="lbl">GSTIN</span><span class="val">{{consignee_gstin}}</span>
+      </div>
+
+      <!-- ===== NAME & ADDRESS ===== -->
+      <div class="row-address">
+        <span class="lbl">NAME &amp;<br>ADDRESS</span>
+        <span class="val">{{name_address}}</span>
+      </div>
+
+      <!-- ===== GOODS TABLE ===== -->
+      <div class="goods-area">
+
+        <!-- Header -->
+        <div class="g-header">
+          <table>
+            <tr>
+              <td class="td-packs">No.Of<br>Packs</td>
+              <td class="td-desc">DESCRIPTION OF GOODS</td>
+              <td class="td-insur">Insurance Policy No</td>
+              <td class="td-imp">IMPORTANT</td>
+              <td class="td-freight" style="border-right:none;">FREIGHT<br>TO PAY/PAID</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Body -->
+        <div class="g-body">
+
+          <!-- Packs -->
+          <div class="g-col-packs">{{no_of_packs}}</div>
+
+          <!-- Description -->
+          <div class="g-col-desc">
+            <div class="desc-title">{{description}} :</div>
+            <table class="desc-table">
+              <tr>
+                <td class="dlbl">LOT NO</td>
+                <td class="dcol">:</td>
+                <td class="dval">{{lot_no}}</td>
+                <td class="dlbl">INVOICE</td>
+                <td class="dcol">:</td>
+                <td class="dval">{{invoice_no}}</td>
+              </tr>
+              <tr>
+                <td class="dlbl">P.R. NOS</td>
+                <td class="dcol">:</td>
+                <td class="dval">{{pr_nos}}</td>
+                <td class="dlbl">AMC NO</td>
+                <td class="dcol">:</td>
+                <td class="dval">{{amc_no}}</td>
+              </tr>
+              <tr>
+                <td class="dlbl">P.M. NO.</td>
+                <td class="dcol">:</td>
+                <td class="dval">{{pm_no}}</td>
+                <td class="dlbl">VALUE</td>
+                <td class="dcol">:</td>
+                <td class="dval">Rs. {{value}}</td>
+              </tr>
+              <tr>
+                <td class="dlbl">NETT WEIGHT</td>
+                <td class="dcol">:</td>
+                <td class="dval">{{nett_weight}}</td>
+                <td class="dlbl">WAY BILL NO.</td>
+                <td class="dcol">:</td>
+                <td class="dval">{{way_bill_no}}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Copy label -->
+          <div class="copy-label">{{copy_label}}</div>
+
+          <!-- Right columns -->
+          <div class="g-col-right">
+            <div class="g-col-insur">{{insurance_policy_no}}</div>
+            <div class="g-col-imp"></div>
+            <div class="g-col-freight"></div>
+
+            <!-- Tax -->
+            <div class="tax-block">
+              <table>
+                <tr>
+                  <td class="t-lbl">SGST</td>
+                  <td class="t-pct">{{gst_pct_split}}%</td>
+                  <td class="t-val">{{sgst}}</td>
+                </tr>
+                <tr>
+                  <td class="t-lbl">CGST</td>
+                  <td class="t-pct">{{gst_pct_split}}%</td>
+                  <td class="t-val">{{cgst}}</td>
+                </tr>
+                <tr>
+                  <td class="t-lbl">IGST</td>
+                  <td class="t-pct">{{gst_pct_full}}%</td>
+                  <td class="t-val">{{igst}}</td>
+                </tr>
+                <tr>
+                  <td class="t-lbl">ADVANCE</td>
+                  <td class="t-pct"></td>
+                  <td class="t-val">{{advance}}</td>
+                </tr>
+                <tr>
+                  <td class="t-lbl">GRAND TOTAL</td>
+                  <td class="t-pct"></td>
+                  <td class="t-val">{{grand_total}}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== TO PAY RUPEES ===== -->
+      <div class="to-pay">
+        <div class="to-pay-decl-space"></div>
+        <div class="to-pay-content"
+          style="position: absolute !important; left: 45mm !important; padding: 0 !important; font-style: italic !important;">
+          <span class="lbl">TO PAY RUPEES</span>&nbsp;&nbsp;{{to_pay_rupees}}</div>
+      </div>
+
+      <!-- ===== FOOTER ===== -->
+      <div class="footer">
+
+        <!-- Top portion -->
+        <div class="footer-top">
+          <div class="footer-delivery"
+            style="position: absolute !important; left: 45mm !important; padding: 0 !important;"><span
+              class="lbl">Delivery at</span> <span class="val">{{delivery_at}}</span>
+            <div class="footer-bank">
+              A/C Name : VAARAHI ROAD LINES<br>
+              A/C No. 510909010378485<br>
+              IFSC Code : CIUB0000817<br>
+              CITY UNION BANK, Nallapadu
+            </div>
+
+            <!-- Digital signature stamp (positioned to the right of bank info) -->
+            <div class="digital-stamp">
+              <div class="ds-name">M. ANIL KUMAR</div>
+              <div>Digitally signed</div>
+              <div>by M. ANIL KUMAR</div>
+              <div>Date: {{generation_date}}</div>
+            </div>
+          </div>
+
+          <!-- Signature area (right side) -->
+          <div class="footer-sign-area">
+            <div class="footer-for-company">For <strong>VAARAHI ROAD LINE'S</strong></div>
+
+            <!-- Signature image with clipping wrapper -->
+            <div class="sign-image-wrapper">
+              <img src="{{signPath}}" class="footer-sign" />
+            </div>
+
+            <!-- Line under signature -->
+            <div class="footer-sign-line"></div>
+
+            <!-- Labels -->
+            <div class="footer-auth-label">Authorised Signature</div>
+          </div>
+        </div>
+
+        <!-- Bottom portion -->
+        <div class="footer-bottom">
+          <div class="footer-juris"
+            style="position: absolute !important; left: 45mm !important; padding: 0 !important;">Subject to Guntur
+            Jurisdiction</div>
+          <div class="footer-risk">GOODS ARE BOOKED AT OWNERS RISK</div>
+          <div class="footer-red">NOTE: DO NOT CASH PAY TO LORRY DRIVER OR OWNER CASH PAY TO FAVOUR OF TRANSPORT ACCOUNT
+            ONLY</div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</body>
+
+</html>
