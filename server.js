@@ -21,7 +21,7 @@ const getSetting = (key) => new Promise((resolve) => {
 
 // Endpoint: Get next LR No
 app.get('/api/next-lr', async (req, res) => {
-  const prefix = await getSetting('lr_prefix') || 'VR';
+  const prefix = await getSetting('lr_prefix') || 'VRLS';
   const nextVal = await getSetting('lr_next_val') || '1001';
   res.json({ lr_no: `${prefix}-${nextVal}` });
 });
@@ -41,6 +41,19 @@ app.get('/api/bills', (req, res) => {
   db.all("SELECT * FROM bills ORDER BY created_at DESC", [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
+  });
+});
+
+// Endpoint: Get specific bill by LR No
+app.get('/api/bills/:lr_no', (req, res) => {
+  db.get("SELECT form_data FROM bills WHERE lr_no = ?", [req.params.lr_no], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row || !row.form_data) return res.status(404).json({ error: 'Bill not found or has no detailed data' });
+    try {
+      res.json(JSON.parse(row.form_data));
+    } catch (e) {
+      res.status(500).json({ error: 'Error parsing form data' });
+    }
   });
 });
 
@@ -75,8 +88,8 @@ app.post('/generate', async (req, res) => {
       const masterFilePath = await generatePDF(masterHTML);
 
       db.run(
-        `INSERT INTO bills (lr_no, consignee, consignor, total_amount, file_path) VALUES (?, ?, ?, ?, ?)`,
-        [data.lr_no || 'N/A', data.consignee || 'N/A', data.consignor || 'N/A', data.grand_total || '0', masterFilePath],
+        `INSERT INTO bills (lr_no, consignee, consignor, total_amount, file_path, form_data) VALUES (?, ?, ?, ?, ?, ?)`,
+        [data.lr_no || 'N/A', data.consignee || 'N/A', data.consignor || 'N/A', data.grand_total || '0', masterFilePath, JSON.stringify(data)],
         async function(err) {
           if (err) {
             console.error('Error inserting bill record:', err);
@@ -91,7 +104,17 @@ app.post('/generate', async (req, res) => {
         }
       );
     } else {
-      console.log(`LR ${data.lr_no} already exists in history. Skipping archival.`);
+      console.log(`LR ${data.lr_no} already exists in history. Updating...`);
+      const masterHTML = generateCopies(template, data, []); 
+      const masterFilePath = await generatePDF(masterHTML);
+      
+      db.run(
+        `UPDATE bills SET consignee = ?, consignor = ?, total_amount = ?, file_path = ?, form_data = ? WHERE lr_no = ?`,
+        [data.consignee || 'N/A', data.consignor || 'N/A', data.grand_total || '0', masterFilePath, JSON.stringify(data), data.lr_no],
+        (err) => {
+          if (err) console.error('Error updating bill record:', err);
+        }
+      );
     }
 
     // 3. Send the requested copy to user

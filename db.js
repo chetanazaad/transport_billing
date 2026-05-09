@@ -16,6 +16,7 @@ db.serialize(() => {
   db.run("ALTER TABLE bills ADD COLUMN consignee TEXT", (err) => {});
   db.run("ALTER TABLE bills ADD COLUMN consignor TEXT", (err) => {});
   db.run("ALTER TABLE bills ADD COLUMN total_amount TEXT", (err) => {});
+  db.run("ALTER TABLE bills ADD COLUMN form_data TEXT", (err) => {});
 
   // Settings table for incremental LR numbers
   db.run(`

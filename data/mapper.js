@@ -40,6 +40,14 @@ function injectData(template, data) {
     generation_date: generationDate
   };
 
+  // Convert HTML date input (yyyy-mm-dd) to dd-mm-yyyy format
+  if (fullData.date && typeof fullData.date === 'string') {
+    const parts = fullData.date.split('-');
+    if (parts.length === 3) {
+      fullData.date = `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+  }
+
   // Replace all {{key}} placeholders
   for (let key in fullData) {
     const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');

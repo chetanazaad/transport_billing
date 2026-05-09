@@ -197,6 +197,22 @@
       padding-top: 16px;
       border-top: 1px solid #e2e8f0;
     }
+
+    /* ========== MOBILE RESPONSIVENESS ========== */
+    @media (max-width: 768px) {
+      .navbar { flex-direction: column; gap: 16px; padding: 16px; }
+      .row-2, .row-3, .row-4 { grid-template-columns: 1fr; }
+      .brand-header .brand-logo { font-size: 24px; }
+      .brand-header .brand-sub { font-size: 9px; line-height: 1.4; }
+      .main { padding: 16px 12px 60px 12px; }
+      .form-card { padding: 20px; }
+      .copy-buttons-row { flex-direction: column; }
+      .copy-buttons-row .btn-generate { height: auto; padding: 16px; }
+      .copy-buttons-row .btn-copy { width: 100%; height: auto; padding: 12px; font-size: 13px; }
+      .actions-container { padding: 16px; }
+      .bottom-meta { flex-direction: column; gap: 16px; align-items: stretch; }
+      .tax-inputs { flex-direction: column; gap: 8px !important; }
+    }
   </style>
 </head>
 <body>
@@ -366,7 +382,7 @@
             <div class="row row-2" style="margin-top:14px; background: rgba(37, 99, 235, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed rgba(37, 99, 235, 0.3);">
               <div class="form-group">
                 <label>Calculated Taxes</label>
-                <div style="display:flex; gap:10px;">
+                <div class="tax-inputs" style="display:flex; gap:10px;">
                   <input id="cgst" name="cgst" readonly placeholder="CGST" style="background:#f8fafc;" />
                   <input id="sgst" name="sgst" readonly placeholder="SGST" style="background:#f8fafc;" />
                   <input id="igst" name="igst" readonly placeholder="IGST" style="background:#f8fafc;" />
@@ -562,9 +578,45 @@
           <td>${b.consignee}</td>
           <td>₹${b.total_amount}</td>
           <td style="color:#64748b;">${new Date(b.created_at).toLocaleDateString()}</td>
-          <td><a href="/output/${b.file_path.split(/[\\/]/).pop()}" class="btn-download" target="_blank">Download</a></td>
+          <td style="display:flex; gap:12px; align-items:center;">
+            <a href="/output/${b.file_path.split(/[\\/]/).pop()}" class="btn-download" target="_blank">Download</a>
+            <a href="#" onclick="editBill('${b.lr_no}')" class="btn-download" style="color: #ea580c;">✏️ Edit</a>
+          </td>
         </tr>
       `).join('');
+    }
+
+    async function editBill(lrNo) {
+      try {
+        const res = await fetch(`/api/bills/${lrNo}`);
+        if (!res.ok) throw new Error('Could not fetch bill details or bill was created before editing was supported.');
+        const data = await res.json();
+        
+        // Switch to form view
+        showPage('new-bill');
+        
+        // Populate form
+        const form = document.getElementById('lr-form');
+        for (const key in data) {
+          const input = form.elements[key];
+          if (input) {
+            input.value = data[key];
+          }
+        }
+        
+        // Update lock status
+        const lockStatus = document.getElementById('lock-status');
+        if (lockStatus) {
+            lockStatus.textContent = '📝 EDITING MODE (LR: ' + lrNo + ')';
+            lockStatus.style.color = '#ea580c';
+        }
+        
+        // Recalculate totals just to ensure UI consistency
+        calculateTotal();
+        
+      } catch (e) {
+        alert(e.message);
+      }
     }
 
     document.getElementById('lr-form').onsubmit = (e) => e.preventDefault();
