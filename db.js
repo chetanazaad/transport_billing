@@ -27,7 +27,7 @@ db.serialize(() => {
   `, () => {
     // Initialize default LR settings if not present
     db.run("INSERT OR IGNORE INTO settings (key, value) VALUES ('lr_prefix', 'VR')");
-    db.run("INSERT OR IGNORE INTO settings (key, value) VALUES ('lr_next_val', '1001')");
+    db.run("INSERT OR IGNORE INTO settings (key, value) VALUES ('lr_next_val', '1')");
   });
 });
 

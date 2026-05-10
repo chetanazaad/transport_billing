@@ -9,8 +9,14 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use(express.static('public'));
-app.use('/output', express.static(path.join(__dirname, 'output')));
+const noCacheOptions = {
+  setHeaders: function (res, path, stat) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  }
+};
+
+app.use(express.static('public', noCacheOptions));
+app.use('/output', express.static(path.join(__dirname, 'output'), noCacheOptions));
 
 // Helper: Get setting
 const getSetting = (key) => new Promise((resolve) => {
@@ -22,8 +28,8 @@ const getSetting = (key) => new Promise((resolve) => {
 // Endpoint: Get next LR No
 app.get('/api/next-lr', async (req, res) => {
   const prefix = await getSetting('lr_prefix') || 'VRLS';
-  const nextVal = await getSetting('lr_next_val') || '1001';
-  res.json({ lr_no: `${prefix}-${nextVal}` });
+  const nextVal = await getSetting('lr_next_val') || '1';
+  res.json({ lr_no: `${prefix}-${String(nextVal).padStart(3, '0')}` });
 });
 
 // Endpoint: Login (Simple)
@@ -55,6 +61,39 @@ app.get('/api/bills/:lr_no', (req, res) => {
       res.status(500).json({ error: 'Error parsing form data' });
     }
   });
+});
+
+app.post('/api/hard-reset', (req, res) => {
+  const { resetPassword } = req.body;
+  
+  // Use a hardcoded "Master Reset Key" distinct from the admin login
+  if (resetPassword !== 'Hrdr8#@15tR') {
+    return res.status(401).json({ success: false, error: 'Authentication failed: Incorrect master reset password' });
+  }
+
+  try {
+    // 1. Database Cleanup
+    db.serialize(() => {
+      db.run("DELETE FROM bills");
+      db.run("UPDATE settings SET value = '1' WHERE key = 'lr_next_val'");
+    });
+
+    // 2. File System Cleanup (Output Directory)
+    const outputDir = path.join(__dirname, 'output');
+    if (fs.existsSync(outputDir)) {
+      const files = fs.readdirSync(outputDir);
+      for (const file of files) {
+        if (file.endsWith('.pdf')) {
+          fs.unlinkSync(path.join(outputDir, file));
+        }
+      }
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error during hard reset:', err);
+    res.status(500).json({ success: false, error: 'Internal server error during reset' });
+  }
 });
 
 app.post('/generate', async (req, res) => {
@@ -97,7 +136,7 @@ app.post('/generate', async (req, res) => {
             // Increment LR number sequence only on successful master archival
             const prefix = await getSetting('lr_prefix');
             const nextVal = await getSetting('lr_next_val');
-            if (data.lr_no === `${prefix}-${nextVal}`) {
+            if (data.lr_no === `${prefix}-${String(nextVal).padStart(3, '0')}`) {
               db.run("UPDATE settings SET value = ? WHERE key = 'lr_next_val'", [parseInt(nextVal) + 1]);
             }
           }
@@ -118,6 +157,7 @@ app.post('/generate', async (req, res) => {
     }
 
     // 3. Send the requested copy to user
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.download(downloadFilePath, `LR_${data.lr_no || 'bill'}.pdf`);
   } catch (error) {
     console.error('Error generating PDF:', error);

@@ -428,6 +428,10 @@
     <!-- ========== HISTORY SECTION ========== -->
     <section id="history" class="page-section">
       <div class="history-card">
+        <div style="padding: 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <input type="text" id="search-history" placeholder="Search by LR No, Consignor, or Consignee..." style="max-width: 350px; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; font-size: 13px;" oninput="filterHistory()" />
+          <button class="btn-copy" onclick="triggerHardReset()" style="background: #dc2626; display: inline-flex; height: 38px; align-items: center; padding: 0 16px; font-size: 12px;">⚠ HARD RESET ALL DATA</button>
+        </div>
         <div class="table-container">
           <table>
             <thead>
@@ -472,6 +476,7 @@
 
   <script>
     let isLoggedIn = false;
+    let allBills = [];
 
     function calculateTotal() {
       const freight = parseFloat(document.getElementById('freight_amt').value) || 0;
@@ -569,9 +574,17 @@
 
     async function loadHistory() {
       const res = await fetch('/api/bills');
-      const bills = await res.json();
+      allBills = await res.json();
+      renderHistoryTable(allBills);
+    }
+
+    function renderHistoryTable(billsArray) {
       const body = document.getElementById('history-body');
-      body.innerHTML = bills.map(b => `
+      if (billsArray.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 24px; color:#64748b;">No bills found.</td></tr>';
+        return;
+      }
+      body.innerHTML = billsArray.map(b => `
         <tr>
           <td style="font-weight:700; color:#2563eb;">${b.lr_no}</td>
           <td>${b.consignor}</td>
@@ -584,6 +597,46 @@
           </td>
         </tr>
       `).join('');
+    }
+
+    function filterHistory() {
+      const query = document.getElementById('search-history').value.toLowerCase();
+      const filtered = allBills.filter(b => 
+        (b.lr_no && b.lr_no.toLowerCase().includes(query)) ||
+        (b.consignor && b.consignor.toLowerCase().includes(query)) ||
+        (b.consignee && b.consignee.toLowerCase().includes(query)) ||
+        (b.total_amount && b.total_amount.toString().toLowerCase().includes(query))
+      );
+      renderHistoryTable(filtered);
+    }
+
+    async function triggerHardReset() {
+      if (!confirm('Are you absolutely sure? This will delete ALL past bills, remove all PDFs, and reset the LR count to 001. This cannot be undone.')) {
+        return;
+      }
+
+      const pass = prompt('Enter the MASTER RESET Password to confirm Hard Reset:');
+      if (!pass) return;
+
+      try {
+        const res = await fetch('/api/hard-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resetPassword: pass })
+        });
+        
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert('System Reset Successful! All data has been wiped.');
+          document.getElementById('search-history').value = '';
+          await fetchNextLR();
+          await loadHistory();
+        } else {
+          alert(result.error || 'Authentication failed: Incorrect master reset password.');
+        }
+      } catch (e) {
+        alert('Error performing hard reset: ' + e.message);
+      }
     }
 
     async function editBill(lrNo) {
